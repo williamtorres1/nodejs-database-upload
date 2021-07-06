@@ -1,10 +1,10 @@
-import { getCustomRepository } from 'typeorm';
+import { getCustomRepository, getRepository } from 'typeorm';
 
 import AppError from '../errors/AppError';
 
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
-import CreateCategoryService from './CreateCategoryService';
+import Category from '../models/Category';
 
 interface Request {
   title: string;
@@ -23,17 +23,25 @@ class CreateTransactionService {
     if (!['income', 'outcome'].includes(type)) {
       throw new AppError('Invalid transaction type');
     }
+
     const transactionsRepository = getCustomRepository(TransactionsRepository);
-
-    const createCategory = new CreateCategoryService();
-    const createdCategory = await createCategory.execute(category);
-
+    const categoriesRepository = getRepository(Category);
     const { total } = await transactionsRepository.getBalance();
 
     if (type === 'outcome' && total < value) {
       throw new AppError('You do not have enough balance');
     }
 
+    let createdCategory = await categoriesRepository.findOne({
+      where: { title: category },
+    });
+
+    if (!createdCategory) {
+      createdCategory = categoriesRepository.create({
+        title: category,
+      });
+      await categoriesRepository.save(createdCategory);
+    }
     const transaction = transactionsRepository.create({
       title,
       value,

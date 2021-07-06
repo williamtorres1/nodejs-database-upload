@@ -7,7 +7,6 @@ import TransactionsRepository from '../repositories/TransactionsRepository';
 import CreateTransactionService from '../services/CreateTransactionService';
 import DeleteTransactionService from '../services/DeleteTransactionService';
 import ImportTransactionsService from '../services/ImportTransactionsService';
-// import ImportTransactionsService from '../services/ImportTransactionsService';
 
 const transactionsRouter = Router();
 const upload = multer(uploadConfig);
@@ -50,9 +49,9 @@ transactionsRouter.post(
   upload.single('csv'),
   async (request, response) => {
     const importTransaction = new ImportTransactionsService();
-    const transactions = await importTransaction.execute(request.file);
+    const transactions = await importTransaction.execute(request.file.path);
 
-    return response.json(transactions);
+    return response.status(201).json(transactions);
   },
 );
 

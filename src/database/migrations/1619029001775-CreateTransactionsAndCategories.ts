@@ -7,7 +7,7 @@ import {
 
 export default class CreateTransactionsAndCategories1619029001775
   implements MigrationInterface {
-  public async up(queryRunner: QueryRunner): Promise<any> {
+  public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
         name: 'transactions',
@@ -89,7 +89,7 @@ export default class CreateTransactionsAndCategories1619029001775
     );
   }
 
-  public async down(queryRunner: QueryRunner): Promise<any> {
+  public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropForeignKey('transactions', 'TransactionsCategory');
     await queryRunner.dropTable('categories');
     await queryRunner.dropTable('transactions');
